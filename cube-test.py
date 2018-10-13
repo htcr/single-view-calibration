@@ -95,7 +95,7 @@ def get_simple_camera():
     # get the intrinsic and extrinsic matrices
     # of a default camera positioned at
     # (10, 10, 8) cm and looking at (0, 0, 0) cm
-    eye = np.array([10, 10, 8], dtype=np.float32)
+    eye = np.array([2, 2, 3], dtype=np.float32)
     at = np.array([0, 0, 0], dtype=np.float32)
     
     # extrinsic
@@ -136,10 +136,13 @@ def draw_poly_2d(ax, poly_2d):
         p2 = vset[:, eset[i, 1]]
         draw_segment_2d(ax, p1, p2, edge_color[i, :])
 
+def draw_img_bound(ax, img_w=600, img_h=600):
+    xs = [0, img_w, img_w, 0, 0]
+    ys = [0, 0, img_h, img_h, 0]
+    ax.plot(xs, ys, c=(0.6, 0.6, 0.6))
+
+
 # test
-
-
-
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.invert_yaxis()
@@ -154,6 +157,7 @@ cube_3d = get_unit_cube()
 cube_2d = project(cube_3d, K, Rt)
 print(cube_2d.vset)
 draw_poly_2d(ax, cube_2d)
+draw_img_bound(ax)
 
 # playground
 plt.show()
