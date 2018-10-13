@@ -77,6 +77,22 @@ def get_image_matrix(f=3.5, aov_w=60, aov_h=60, img_w=600, img_h=600):
     image_matrix = np.array([[ax, 0, bx], [0, ay, by], [0, 0, 1]], dtype=np.float32)
     return image_matrix
 
+def get_simple_camera():
+    # get the intrinsic and extrinsic matrices
+    # of a default camera positioned at
+    # (10, 10, 8) cm and looking at (0, 0, 0) cm
+    eye = np.array([10, 10, 8], dtype=np.float32)
+    at = np.array([0, 0, 0], dtype=np.float32)
+    
+    # extrinsic
+    Rt = get_look_at_matrix(eye, at)
+    
+    # intrinsic
+    M_cam = get_camera_matrix()
+    M_img = get_image_matrix()
+    K = M_img @ M_cam
+
+    return K, Rt
 
 
  
