@@ -10,6 +10,24 @@ class Polygon(object):
         self.vset = vset
         self.eset = eset
         self.edge_color = None
+    
+    def get_dimension(self):
+        return vset.shape[0]
+
+def to_homogeneous(points):
+    # points: nd array of shape (d, N)
+    # return: nd array of shape (d+1, N),
+    # with last row are all 1
+    h = np.ones((1, points.shape[1]), dtype=np.float32)
+    return np.concatenate((points, h), axis=0)
+
+def to_cartesian(points):
+    # points: nd array of shape (d+1, N)
+    # return: nd array of shape (d, N)
+    assert points.shape[0] > 1
+    ans = points[:-1, :].copy()
+    ans = ans / points[-1, :][np.newaxis, :]
+    return ans
 
 def get_unit_cube():
     vset = [[0,0,0], [1,0,0], [1,1,0], [0,1,0],
@@ -52,7 +70,7 @@ def get_look_at_matrix(eye, at):
 
     # put together
     R = np.stack((cx, cy, cz), axis=0)
-    Rt = np.stack((R, t), axis=1)
+    Rt = np.concatenate((R, t[:, np.newaxis]), axis=1)
     return Rt
     
 def get_camera_matrix(f=3.5):
@@ -94,9 +112,20 @@ def get_simple_camera():
 
     return K, Rt
 
+def project(Polygon poly_3d, K, Rt):
+    # project a 3d polygon to 2d with 
+    # intrinsic and extrinsic matrices
+    # poly_3d: 3d input polygon
+    # K, Rt: intrinsic and extrinsic
+    # return: a 2d polygon with image pixel coordinate
 
  
 # test
+
+K, Rt = get_simple_camera()
+print(K)
+print(Rt)
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.invert_yaxis()
