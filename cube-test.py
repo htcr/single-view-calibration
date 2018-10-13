@@ -3,13 +3,16 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 
 class Polygon(object):
-    def __init__(self, vset, eset):
+    def __init__(self, vset, eset, edge_color=None):
         # vset: 3xNv 3d point set
-        # eset: edge set, 2xNe int pair set, each col
+        # eset: edge set, Nex2 int pair set, each col
         # indicates two vertices that are connected
         self.vset = vset
         self.eset = eset
-        self.edge_color = None
+        if edge_color is None:
+            self.edge_color = np.zeros((eset.shape[0], 3), dtype=np.float32)
+        else:
+            self.edge_color = edge_color
     
     def get_dimension(self):
         return vset.shape[0]
@@ -36,13 +39,12 @@ def get_unit_cube():
     eset = [[0,1], [1,2], [2,3], [3,0],
             [0,4], [1,5], [2,6], [3,7],
             [4,5], [5,6], [6,7], [7,4]]
-    eset = np.array(eset, dtype=np.int32).transpose((1, 0))
-    edge_color = np.zeros((3, eset.shape[1]), dtype=np.float32)
-    edge_color[:, 0] = [1, 0, 0]
-    edge_color[:, 3] = [0, 1, 0]
-    edge_color[:, 4] = [0, 0, 1]
-    cube = Polygon(vset, eset)
-    cube.edge_color = edge_color
+    eset = np.array(eset, dtype=np.int32)
+    edge_color = np.zeros((eset.shape[0], 3), dtype=np.float32)
+    edge_color[0, :] = [1, 0, 0]
+    edge_color[3, :] = [0, 1, 0]
+    edge_color[4, :] = [0, 0, 1]
+    cube = Polygon(vset, eset, edge_color)
     return cube
 
 def draw_segment_2d(ax, p1, p2, color):
@@ -112,14 +114,20 @@ def get_simple_camera():
 
     return K, Rt
 
-def project(Polygon poly_3d, K, Rt):
+def project(poly_3d, K, Rt):
     # project a 3d polygon to 2d with 
     # intrinsic and extrinsic matrices
-    # poly_3d: 3d input polygon
+    # poly_3d: 3d input Polygon
     # K, Rt: intrinsic and extrinsic
     # return: a 2d polygon with image pixel coordinate
+    assert poly_3d.vset.shape[0] == 3
+    vset_3d_homo = to_homogeneous(poly_3d.vset)
+    vset_2d_homo = K @ Rt @ vset_3d_homo
+    vset_2d_cart = to_cartesian(vset_2d_homo)
+    return Polygon(vset_2d_cart, poly_3d.eset, poly_3d.edge_color)
 
- 
+    
+
 # test
 
 K, Rt = get_simple_camera()
