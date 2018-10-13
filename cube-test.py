@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.linalg as la
 import matplotlib.pyplot as plt
 
 class Polygon(object):
@@ -33,6 +34,51 @@ def draw_segment_2d(ax, p1, p2, color):
     ys = [p1[1], p2[1]]
     ax.plot(xs, ys, c=color)
 
+def get_look_at_matrix(eye, at):
+    # eye, at: 3d point coordinate, cartesian, np array of shape (3,)
+    # return : np array of shape (3, 4)
+    
+    # camera system axes in world coordinate
+    cz = at - eye
+    cz = cz / la.norm(cz)
+    up = np.array([0, 0, 1], dtype=np.float32)
+    cx = np.cross(cz, up)
+    cx = cx / la.norm(cx)
+    cy = np.cross(cz, cx)
+    cy = cy / la.norm(cy)
+
+    # last column of projection matrix
+    t = -eye
+
+    # put together
+    R = np.stack((cx, cy, cz), axis=0)
+    Rt = np.stack((R, t), axis=1)
+    return Rt
+    
+def get_camera_matrix(f=3.5):
+    # f: focal length, in cm
+    # return: transformation from camera coordinate 
+    # to image plane coordinate (not pixel coordinate!),
+    # np array of shape (3, 3)
+    camera_matrix = np.array([[f, 0, 0], [0, f, 0], [0, 0, 1]], dtype=np.float32)
+    return camera_matrix
+
+def get_image_matrix(f=3.5, aov_w=60, aov_h=60, img_w=600, img_h=600):
+    # f: focal length, in cm
+    # aov_w, aov_h: angle of view, in degrees
+    # img_w, img_h: image size in pixel
+    # return: transformation from image plane coordinate
+    # to image pixel coordinate, 
+    # np array of shape (3, 3)
+    ax = img_w / (2.0*f) * np.cos(np.deg2rad(aov_w) / 2.0)
+    ay = img_h / (2.0*f) * np.cos(np.deg2rad(aov_h) / 2.0)
+    bx = img_w / 2.0
+    by = img_h / 2.0
+    image_matrix = np.array([[ax, 0, bx], [0, ay, by], [0, 0, 1]], dtype=np.float32)
+    return image_matrix
+
+
+
  
 # test
 fig = plt.figure()
@@ -41,6 +87,6 @@ ax.invert_yaxis()
 ax.axis('equal')
 p1 = (1, 0)
 p2 = (0, 1)
-color = (1, 0, 0)
+color = (0, 0, 0)
 draw_segment_2d(ax, p1, p2, color)
 plt.show()
