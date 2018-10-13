@@ -60,12 +60,13 @@ def get_look_at_matrix(eye, at):
     cy = np.cross(cz, cx)
     cy = cy / la.norm(cy)
 
-    # last column of projection matrix
-    t = -eye
-
     # put together
     R = np.stack((cx, cy, cz), axis=0)
-    Rt = np.concatenate((R, t[:, np.newaxis]), axis=1)
+    
+    # last column of projection matrix
+    t = R @ (-eye)[:, np.newaxis]
+    
+    Rt = np.concatenate((R, t), axis=1)
     return Rt
     
 def get_camera_matrix(f=3.5):
@@ -83,8 +84,8 @@ def get_image_matrix(f=3.5, aov_w=60, aov_h=60, img_w=600, img_h=600):
     # return: transformation from image plane coordinate
     # to image pixel coordinate, 
     # np array of shape (3, 3)
-    ax = img_w / (2.0*f) * np.cos(np.deg2rad(aov_w) / 2.0)
-    ay = img_h / (2.0*f) * np.cos(np.deg2rad(aov_h) / 2.0)
+    ax = img_w / (2.0*f) * np.cos(np.deg2rad(aov_w/2.0))
+    ay = img_h / (2.0*f) * np.cos(np.deg2rad(aov_h/2.0))
     bx = img_w / 2.0
     by = img_h / 2.0
     image_matrix = np.array([[ax, 0, bx], [0, ay, by], [0, 0, 1]], dtype=np.float32)
@@ -104,7 +105,6 @@ def get_simple_camera():
     M_cam = get_camera_matrix()
     M_img = get_image_matrix()
     K = M_img @ M_cam
-
     return K, Rt
 
 def project(poly_3d, K, Rt):
@@ -152,6 +152,7 @@ print(Rt)
 
 cube_3d = get_unit_cube()
 cube_2d = project(cube_3d, K, Rt)
+print(cube_2d.vset)
 draw_poly_2d(ax, cube_2d)
 
 # playground
