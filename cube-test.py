@@ -15,7 +15,7 @@ class Polygon(object):
             self.edge_color = edge_color
     
     def get_dimension(self):
-        return vset.shape[0]
+        return self.vset.shape[0]
 
 def to_homogeneous(points):
     # points: nd array of shape (d, N)
@@ -46,13 +46,6 @@ def get_unit_cube():
     edge_color[4, :] = [0, 0, 1]
     cube = Polygon(vset, eset, edge_color)
     return cube
-
-def draw_segment_2d(ax, p1, p2, color):
-    # p1, p2: (x, y)
-    # color: (r, g, b)
-    xs = [p1[0], p2[0]]
-    ys = [p1[1], p2[1]]
-    ax.plot(xs, ys, c=color)
 
 def get_look_at_matrix(eye, at):
     # eye, at: 3d point coordinate, cartesian, np array of shape (3,)
@@ -126,20 +119,40 @@ def project(poly_3d, K, Rt):
     vset_2d_cart = to_cartesian(vset_2d_homo)
     return Polygon(vset_2d_cart, poly_3d.eset, poly_3d.edge_color)
 
-    
+def draw_segment_2d(ax, p1, p2, color):
+    # p1, p2: (x, y)
+    # color: (r, g, b)
+    xs = [p1[0], p2[0]]
+    ys = [p1[1], p2[1]]
+    ax.plot(xs, ys, c=color)
+
+def draw_poly_2d(ax, poly_2d):
+    # draw a 2d Polygon.
+    vset = poly_2d.vset
+    eset = poly_2d.eset
+    edge_color = poly_2d.edge_color
+    for i in range(eset.shape[0]):
+        p1 = vset[:, eset[i, 0]]
+        p2 = vset[:, eset[i, 1]]
+        draw_segment_2d(ax, p1, p2, edge_color[i, :])
 
 # test
 
-K, Rt = get_simple_camera()
-print(K)
-print(Rt)
+
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.invert_yaxis()
 ax.axis('equal')
-p1 = (1, 0)
-p2 = (0, 1)
-color = (0, 0, 0)
-draw_segment_2d(ax, p1, p2, color)
+# playground
+
+K, Rt = get_simple_camera()
+print(K)
+print(Rt)
+
+cube_3d = get_unit_cube()
+cube_2d = project(cube_3d, K, Rt)
+draw_poly_2d(ax, cube_2d)
+
+# playground
 plt.show()
