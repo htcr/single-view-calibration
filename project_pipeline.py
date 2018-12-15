@@ -32,10 +32,13 @@ def to_cartesian(points):
     ans = ans / points[-1, :][np.newaxis, :]
     return ans
 
-def get_unit_cube():
+def get_unit_cube(scale=1.0, offset=(0, 0, 0)):
+    # scale: scalar, edge length, in cm
+    # offset: world coordinate of the first vertex, in cm
     vset = [[0,0,0], [1,0,0], [1,1,0], [0,1,0],
             [0,0,1], [1,0,1], [1,1,1], [0,1,1]]
-    vset = np.array(vset, dtype=np.float32).transpose((1,0))
+    vset = np.array(vset, dtype=np.float32).transpose((1,0)) * scale
+    vset += np.array(offset).reshape(-1, 1)
     eset = [[0,1], [1,2], [2,3], [3,0],
             [0,4], [1,5], [2,6], [3,7],
             [4,5], [5,6], [6,7], [7,4]]
@@ -91,12 +94,12 @@ def get_image_matrix(f=3.5, aov_w=60, aov_h=60, img_w=600, img_h=600):
     image_matrix = np.array([[ax, 0, bx], [0, ay, by], [0, 0, 1]], dtype=np.float32)
     return image_matrix
 
-def get_simple_camera():
+def get_simple_camera(eye=(2, 2, 3), at=(0, 0, 0)):
     # get the intrinsic and extrinsic matrices
     # of a default camera positioned at
     # (2, 2, 3) cm and looking at (0, 0, 0) cm
-    eye = np.array([2, 2, 3], dtype=np.float32)
-    at = np.array([0, 0, 0], dtype=np.float32)
+    eye = np.array(eye, dtype=np.float32)
+    at = np.array(at, dtype=np.float32)
     
     # extrinsic
     Rt = get_look_at_matrix(eye, at)

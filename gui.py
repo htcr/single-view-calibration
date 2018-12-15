@@ -41,7 +41,7 @@ def new_home(self, *args, **kwargs):
 NavigationToolbar2.home = new_home
 
 
-img = cv2.imread('test.jpg')
+img = cv2.imread('virtual_test.png')
 fig, ax = plt.subplots()
 plt.imshow(img)
 
@@ -98,8 +98,8 @@ class DrawLineControl(object):
         xs, ys = ps
         xe, ye = pe
         self.ax.plot([xs, xe], [ys, ye], linewidth=2)
-        self.ax.text(xs, ys, ('%d' % line_id), color=(1.0, 1.0, 1.0))
-        self.ax.text(xe, ye, ('%d' % line_id), color=(1.0, 1.0, 1.0))
+        self.ax.text(xs, ys, ('%d' % line_id), color=(0.0, 1.0, 0.0))
+        self.ax.text(xe, ye, ('%d' % line_id), color=(0.0, 1.0, 0.0))
         self.plt.draw()
         
 draw_line_ctrl = DrawLineControl(plt, ax, img.shape[0:2])
