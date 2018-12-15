@@ -70,3 +70,14 @@ def intersect_line_with_rect(line, rect):
     
     return final_pts[0], final_pts[1]
     
+def multi_line_itsc(lines):
+    # lines: list of line, general vec form
+    # return: (x, y) mean square error itsc point
+    A = np.concatenate(lines, axis=1).T
+    U, S, Vt = np.linalg.svd(A)
+    x, y, w = Vt[2, :]
+    if np.abs(w) < 1e-5:
+        return None
+    else:
+        x, y = x/w, y/w
+        return (x, y)
