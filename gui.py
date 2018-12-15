@@ -2,6 +2,44 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 from math_helper import *
+from matplotlib.widgets import Button
+from matplotlib.backend_bases import NavigationToolbar2
+
+home = NavigationToolbar2.home
+
+def draw_itsc_point(ax, pt, bound):
+    h, w = bound
+    x, y = pt
+    if 0 <= x < w and 0 <= y < h:
+        ax.plot(x, y, '*', MarkerSize=6, linewidth=2)
+
+def new_home(self, *args, **kwargs):
+    # hijack home button callback,
+    # make it an action button for commands
+    cmd = input('Input command:')
+    cmd_spt = cmd.split(' ')
+    if len(cmd_spt)==2:
+        action, params = cmd_spt
+        if action == 'itsc':
+            try:
+                itsc_line_ids = eval(params)
+                lines = [draw_line_ctrl.lines[i].general_form for i in itsc_line_ids]
+                itsc_pt = multi_line_itsc(lines)
+                print('itsc point: ')
+                print(itsc_pt)
+                draw_itsc_point(ax, itsc_pt, img.shape[0:2])
+                plt.draw()
+
+            except Exception as e:
+                print('bad command')
+        else:
+            print('bad command')
+    else:
+        print('bad command')
+    home(self, *args, **kwargs)
+
+NavigationToolbar2.home = new_home
+
 
 img = cv2.imread('test.jpg')
 fig, ax = plt.subplots()
@@ -34,6 +72,13 @@ class DrawLineControl(object):
 
     def click_callback(self, event):
         if event.xdata:
+            
+            '''
+            print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' % 
+            ('double' if event.dblclick else 'single', event.button,
+            event.x, event.y, event.xdata, event.ydata))
+            '''
+
             x, y = event.xdata, event.ydata
             if not self.first_point:
                 self.first_point = (x, y)
@@ -59,6 +104,10 @@ class DrawLineControl(object):
         
 draw_line_ctrl = DrawLineControl(plt, ax, img.shape[0:2])
 cid = fig.canvas.mpl_connect('button_press_event', draw_line_ctrl.click_callback)
+
+
+
+
 plt.show()
 
 '''
