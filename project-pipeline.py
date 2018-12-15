@@ -141,23 +141,23 @@ def draw_img_bound(ax, img_w=600, img_h=600):
     ys = [0, 0, img_h, img_h, 0]
     ax.plot(xs, ys, c=(0.6, 0.6, 0.6))
 
+if __name__ == '__main__':
+    # test
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.invert_yaxis()
+    ax.axis('equal')
+    # playground
 
-# test
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.invert_yaxis()
-ax.axis('equal')
-# playground
+    K, Rt = get_simple_camera()
+    print(K)
+    print(Rt)
 
-K, Rt = get_simple_camera()
-print(K)
-print(Rt)
+    cube_3d = get_unit_cube()
+    cube_2d = project(cube_3d, K, Rt)
+    print(cube_2d.vset)
+    draw_poly_2d(ax, cube_2d)
+    draw_img_bound(ax)
 
-cube_3d = get_unit_cube()
-cube_2d = project(cube_3d, K, Rt)
-print(cube_2d.vset)
-draw_poly_2d(ax, cube_2d)
-draw_img_bound(ax)
-
-# playground
-plt.show()
+    # playground
+    plt.show()
