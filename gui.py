@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-from math_helper import two_points_to_general
+from math_helper import *
 
 img = cv2.imread('test.jpg')
 fig, ax = plt.subplots()
@@ -15,11 +15,12 @@ class Line(object):
         self.general_form = two_points_to_general(self.two_points_form)
 
 class DrawLineControl(object):
-    def __init__(self, ax, img_shape):
+    def __init__(self, plt, ax, img_shape):
         # ax: where to draw line
         # img_shape: (h, w)
         self.lines = list()
         self.first_point = None
+        self.plt = plt
         self.ax = ax
 
         # img bounds, four lines, in vector form
@@ -38,22 +39,26 @@ class DrawLineControl(object):
                 self.first_point = (x, y)
             else:
                 second_point = (x, y)
-                new_line = (self.first_point, second_point)
+                new_line = Line(self.first_point, second_point)
                 new_line_id = len(self.lines)
                 self.lines.append(new_line)
-
-                # TODO: draw new line
-
+                self.draw_new_line(new_line, new_line_id)
                 self.first_point = None
         else:
             print('click out of bound')
 
     def draw_new_line(self, new_line, line_id):
-        pass
-
-
-
-
+        general_form = new_line.general_form
+        ps, pe = intersect_line_with_rect(general_form, self.bounds)
+        xs, ys = ps
+        xe, ye = pe
+        self.ax.plot([xs, xe], [ys, ye], linewidth=2)
+        self.ax.text(xs, ys, ('%d' % line_id), color=(1.0, 1.0, 1.0))
+        self.ax.text(xe, ye, ('%d' % line_id), color=(1.0, 1.0, 1.0))
+        self.plt.draw()
+        
+draw_line_ctrl = DrawLineControl(plt, ax, img.shape[0:2])
+cid = fig.canvas.mpl_connect('button_press_event', draw_line_ctrl.click_callback)
 plt.show()
 
 '''
