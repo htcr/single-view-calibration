@@ -41,7 +41,7 @@ def new_home(self, *args, **kwargs):
 NavigationToolbar2.home = new_home
 
 
-img = cv2.imread('virtual_test.png')
+img = cv2.imread('robo_down.jpg')[:, :, ::-1]
 fig, ax = plt.subplots()
 plt.imshow(img)
 
@@ -97,7 +97,7 @@ class DrawLineControl(object):
         ps, pe = intersect_line_with_rect(general_form, self.bounds)
         xs, ys = ps
         xe, ye = pe
-        self.ax.plot([xs, xe], [ys, ye], linewidth=2)
+        self.ax.plot([xs, xe], [ys, ye], linewidth=1)
         self.ax.text(xs, ys, ('%d' % line_id), color=(0.0, 1.0, 0.0))
         self.ax.text(xe, ye, ('%d' % line_id), color=(0.0, 1.0, 0.0))
         self.plt.draw()
