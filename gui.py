@@ -41,7 +41,7 @@ def new_home(self, *args, **kwargs):
 NavigationToolbar2.home = new_home
 
 
-img = cv2.imread('robo_down.jpg')[:, :, ::-1]
+img = cv2.imread('corridor2.jpg')[:, :, ::-1]
 fig, ax = plt.subplots()
 plt.imshow(img)
 
